@@ -20,6 +20,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Movement)
 		class APawn* Pawn;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Movement)
+		bool bIsRolling;
+
 public:
 
 	virtual void NativeInitializeAnimation() override;

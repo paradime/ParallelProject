@@ -2,6 +2,7 @@
 
 
 #include "MainAnimInstance.h"
+#include "MainCharacter.h"
 
 void UMainAnimInstance::NativeInitializeAnimation()
 {
@@ -14,4 +15,9 @@ void UMainAnimInstance::UpdateAnimationProperties()
 	if (!Pawn) return;
 	FVector Speed = Pawn->GetVelocity();
 	MovementSpeed = FVector(Speed.X, Speed.Y, 0.f).Size();
+	AMainCharacter* Main = Cast<AMainCharacter>(Pawn);
+	if (Main) {
+		bIsRolling = Main->bIsRolling;
+	}
+
 }

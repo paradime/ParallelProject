@@ -7,6 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "TimerManager.h"
+
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -37,6 +39,10 @@ AMainCharacter::AMainCharacter()
 
 	YPoint = 1;
 	XPoint = 0;
+	XMove = 1;
+	YMove = 0;
+
+	bIsRolling = false;
 }
 
 // Called when the game starts or when spawned
@@ -56,6 +62,9 @@ void AMainCharacter::Tick(float DeltaTime)
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAction("Roll", EInputEvent::IE_Pressed, this, &AMainCharacter::Roll);
+
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("PointForward", this, &AMainCharacter::PointForward);
@@ -64,13 +73,15 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AMainCharacter::MoveForward(float Value)
 {
-	if ((!Controller) || (Value == 0.f)) return;
+	if (!bIsRolling) XMove = Value;
+	if ((!Controller) || (Value == 0.f) || (bIsRolling)) return;
 	AddMovementInput(FVector(1.f, 0.f, 0.f), Value);
 }
 
 void AMainCharacter::MoveRight(float Value)
 {
-	if ((!Controller) || (Value == 0.f)) return;
+	if (!bIsRolling) YMove = Value;
+	if ((!Controller) || (Value == 0.f) || (bIsRolling)) return;
 	AddMovementInput(FVector(0.f, 1.f, 0.f), Value);
 }
 
@@ -86,8 +97,25 @@ void AMainCharacter::PointRight(float Value)
 	UpdateFaceDirection();
 }
 
+void AMainCharacter::Roll_Implementation()
+{
+	//bIsRolling = true;
+	//FVector RollDirection = FVector(XMove, YMove, 0.f);
+	//GetWorldTimerManager().SetTimer(RollDurationHandle, this, &AMainCharacter::StopRolling, 1.7f);
+}
+
+void AMainCharacter::UpdateRollLocation(float XLoc, float YLoc)
+{
+	FVector NewLocation = GetActorLocation();
+	NewLocation.X += XLoc;
+	NewLocation.Y += YLoc;
+	SetActorLocation(NewLocation);
+}
+
 void AMainCharacter::UpdateFaceDirection()
 {
+	if (bIsRolling) return;
+	if (XPoint == 0 && YPoint == 0) return;
 	FVector point = FVector(XPoint, YPoint, 0.f);
 	GetController()->SetControlRotation(point.Rotation());
 }
