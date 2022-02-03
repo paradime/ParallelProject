@@ -4,6 +4,7 @@
 #include "Projectile.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "Enemy.h"
 
 // Sets default values
 AProjectile::AProjectile()
@@ -25,6 +26,8 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnOverlapBegin);
+	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AProjectile::OnOverlapEnd);
 
 }
 
@@ -34,5 +37,18 @@ void AProjectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	SetActorLocation(GetActorLocation() + (Direction * Velocity * DeltaTime));
 
+}
+
+void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	auto Enemy = Cast<AEnemy>(OtherActor);
+	if (Enemy) {
+		Enemy->Destroy();
+		Destroy();
+	}
+}
+
+void AProjectile::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 }
 
