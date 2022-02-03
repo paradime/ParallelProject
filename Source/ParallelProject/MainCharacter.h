@@ -21,10 +21,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
 		class UCameraComponent* CameraComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement)
-		bool bIsRolling;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement)
+	//	bool bIsRolling;
 
-	FTimerHandle RollDurationHandle;
+	//FTimerHandle RollDurationHandle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement)
 		float YMove;
@@ -36,8 +36,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	float YPoint;
-	float XPoint;
+	//float YPoint;
+	//float XPoint;
 
 public:
 	// Called every frame
@@ -49,18 +49,18 @@ public:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
-	void PointForward(float Value);
-	void PointRight(float Value);
+	//void PointForward(float Value);
+	//void PointRight(float Value);
 
-	UFUNCTION(BlueprintNativeEvent)
-		void Roll();
+	//UFUNCTION(BlueprintNativeEvent)
+	//	void Roll();
 
-	UFUNCTION(BluePrintCallable)
-		void UpdateRollLocation(float XLoc, float YLoc);
+	//UFUNCTION(BluePrintCallable)
+	//	void UpdateRollLocation(float XLoc, float YLoc);
 
-	FORCEINLINE void StopRolling() {
-		bIsRolling = false;
-	}
+	//FORCEINLINE void StopRolling() {
+	//	bIsRolling = false;
+	//}
 private:
-	void UpdateFaceDirection();
+	//void UpdateFaceDirection();
 };

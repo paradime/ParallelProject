@@ -16,8 +16,8 @@ void UMainAnimInstance::UpdateAnimationProperties()
 	FVector Speed = Pawn->GetVelocity();
 	MovementSpeed = FVector(Speed.X, Speed.Y, 0.f).Size();
 	AMainCharacter* Main = Cast<AMainCharacter>(Pawn);
-	if (Main) {
-		bIsRolling = Main->bIsRolling;
-	}
+	//if (Main) {
+	//	bIsRolling = Main->bIsRolling;
+	//}
 
 }

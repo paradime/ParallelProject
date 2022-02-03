@@ -21,8 +21,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Movement)
 		class APawn* Pawn;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Movement)
-		bool bIsRolling;
+	//UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Movement)
+	//	bool bIsRolling;
 
 public:
 

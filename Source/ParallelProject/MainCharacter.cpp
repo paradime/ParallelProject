@@ -33,16 +33,16 @@ AMainCharacter::AMainCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...
-	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...
+	//GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 840.f, 0.f); // ...at this rotation rate.
 
-	YPoint = 1;
-	XPoint = 0;
+	//YPoint = 1;
+	//XPoint = 0;
 	XMove = 1;
 	YMove = 0;
 
-	bIsRolling = false;
+	//bIsRolling = false;
 }
 
 // Called when the game starts or when spawned
@@ -62,61 +62,59 @@ void AMainCharacter::Tick(float DeltaTime)
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Roll", EInputEvent::IE_Pressed, this, &AMainCharacter::Roll);
+	//PlayerInputComponent->BindAction("Roll", EInputEvent::IE_Pressed, this, &AMainCharacter::Roll);
 
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("PointForward", this, &AMainCharacter::PointForward);
-	PlayerInputComponent->BindAxis("PointRight", this, &AMainCharacter::PointRight);
+	//PlayerInputComponent->BindAxis("PointForward", this, &AMainCharacter::PointForward);
+	//PlayerInputComponent->BindAxis("PointRight", this, &AMainCharacter::PointRight);
 }
 
 void AMainCharacter::MoveForward(float Value)
 {
-	if (!bIsRolling) XMove = Value;
-	if ((!Controller) || (Value == 0.f) || (bIsRolling)) return;
+	if ((!Controller) || (Value == 0.f)) return;
 	AddMovementInput(FVector(1.f, 0.f, 0.f), Value);
 }
 
 void AMainCharacter::MoveRight(float Value)
 {
-	if (!bIsRolling) YMove = Value;
-	if ((!Controller) || (Value == 0.f) || (bIsRolling)) return;
+	if ((!Controller) || (Value == 0.f)) return;
 	AddMovementInput(FVector(0.f, 1.f, 0.f), Value);
 }
 
-void AMainCharacter::PointForward(float Value)
-{
-	XPoint = Value;
-	UpdateFaceDirection();
-}
+//void AMainCharacter::PointForward(float Value)
+//{
+//	XPoint = Value;
+//	UpdateFaceDirection();
+//}
+//
+//void AMainCharacter::PointRight(float Value)
+//{
+//	YPoint = Value;
+//	UpdateFaceDirection();
+//}
 
-void AMainCharacter::PointRight(float Value)
-{
-	YPoint = Value;
-	UpdateFaceDirection();
-}
+//void AMainCharacter::Roll_Implementation()
+//{
+//	//bIsRolling = true;
+//	//FVector RollDirection = FVector(XMove, YMove, 0.f);
+//	//GetWorldTimerManager().SetTimer(RollDurationHandle, this, &AMainCharacter::StopRolling, 1.7f);
+//}
 
-void AMainCharacter::Roll_Implementation()
-{
-	//bIsRolling = true;
-	//FVector RollDirection = FVector(XMove, YMove, 0.f);
-	//GetWorldTimerManager().SetTimer(RollDurationHandle, this, &AMainCharacter::StopRolling, 1.7f);
-}
-
-void AMainCharacter::UpdateRollLocation(float XLoc, float YLoc)
-{
-	FVector NewLocation = GetActorLocation();
-	NewLocation.X += XLoc;
-	NewLocation.Y += YLoc;
-	SetActorLocation(NewLocation);
-}
-
-void AMainCharacter::UpdateFaceDirection()
-{
-	if (bIsRolling) return;
-	if (XPoint == 0 && YPoint == 0) return;
-	FVector point = FVector(XPoint, YPoint, 0.f);
-	GetController()->SetControlRotation(point.Rotation());
-}
+//void AMainCharacter::UpdateRollLocation(float XLoc, float YLoc)
+//{
+//	FVector NewLocation = GetActorLocation();
+//	NewLocation.X += XLoc;
+//	NewLocation.Y += YLoc;
+//	SetActorLocation(NewLocation);
+//}
+//
+//void AMainCharacter::UpdateFaceDirection()
+//{
+//	if (bIsRolling) return;
+//	if (XPoint == 0 && YPoint == 0) return;
+//	FVector point = FVector(XPoint, YPoint, 0.f);
+//	GetController()->SetControlRotation(point.Rotation());
+//}
 
