@@ -25,11 +25,16 @@ public:
 		TSubclassOf<class AProjectile> Projectile;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mechanics)
-		class UBoxComponent* SpawnVolume;
+	float SpawnXExtent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mechanics)
+	float SpawnYExtent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mechanics)
 		TSubclassOf<class AEnemy> EnemyClass;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mechanics)
+	TArray<AActor*> ExistingEnemies;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

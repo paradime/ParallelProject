@@ -13,6 +13,8 @@
 #include "TimerManager.h"
 #include "Enemy.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
@@ -32,9 +34,9 @@ AMainCharacter::AMainCharacter()
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
 
-	SpawnVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawnVolume"));
-	SpawnVolume->SetupAttachment(GetRootComponent());
-	SpawnVolume->SetBoxExtent(FVector(750.f, 1350.f, 32.f));
+	SpawnYExtent = 850.f;
+	SpawnXExtent = 1350.f;
+	ExistingEnemies = TArray<AActor*>();
 
 	// Don't rotate when the controller rotates
 	// let that just affect the camera.
@@ -53,7 +55,10 @@ void AMainCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMainCharacter::MakeProjectile, 2.f);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMainCharacter::MakeProjectile, 1.9f);
+
+	FTimerHandle SpawnTimer;
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &AMainCharacter::SpawnEnemy, 2.f);
 }
 
 // Called every frame
@@ -92,11 +97,27 @@ void AMainCharacter::MakeProjectile()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
-	auto Proj = GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation(), GetActorRotation(), SpawnParams);
-	if (Proj) {
-		Proj->SetDirection(GetActorRotation().Vector());
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMainCharacter::MakeProjectile, 2.f);
+	AProjectile* Proj;
+	float Distance;
+	auto NearestEnemy = UGameplayStatics::FindNearestActor(GetActorLocation(), ExistingEnemies, Distance);
+	if(NearestEnemy)
+	{
+		auto LookAtRotation =
+			UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), NearestEnemy->GetActorLocation());
+		Proj = GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation(), LookAtRotation, SpawnParams);
+		if (Proj) {
+			Proj->SetDirection(FRotator(0.f, LookAtRotation.Yaw, 0.f).Vector());
+		}
 	}
+	else
+	{
+		Proj = GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (Proj)
+		{
+			Proj->SetDirection(GetActorRotation().Vector());
+		}
+	}
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMainCharacter::MakeProjectile, 2.f);
 
 }
 
@@ -110,12 +131,14 @@ void AMainCharacter::SpawnEnemy()
 
 	const FRotator Rotation(0.f);
 	FActorSpawnParameters SpawnParameters;
-	GetWorld()->SpawnActor<AEnemy>(EnemyClass, GetRandomLocationOnSpawnVolumePerimeter(), Rotation, SpawnParameters);
+	auto Enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, GetRandomLocationOnSpawnVolumePerimeter(), Rotation, SpawnParameters);
+	ExistingEnemies.Add(Enemy);
+	FTimerHandle SpawnTimer;
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &AMainCharacter::SpawnEnemy, 2.f);
 }
 
 FVector AMainCharacter::GetRandomLocationOnSpawnVolumePerimeter()
 {
-	const auto VolumeExtent = SpawnVolume->GetScaledBoxExtent();
 	const auto CurrentLocation = GetActorLocation();
 	float XLoc = CurrentLocation.X;
 	float YLoc = CurrentLocation.Y;
@@ -123,20 +146,20 @@ FVector AMainCharacter::GetRandomLocationOnSpawnVolumePerimeter()
 	switch (FMath::RandRange(0,3))
 	{
 	case 0: // left side
-		XLoc = FMath::FRandRange(CurrentLocation.X-VolumeExtent.X,CurrentLocation.X+VolumeExtent.X);
-		YLoc = CurrentLocation.Y + VolumeExtent.Y;
+		XLoc = FMath::FRandRange(CurrentLocation.X-SpawnXExtent,CurrentLocation.X+SpawnXExtent);
+		YLoc = CurrentLocation.Y + SpawnYExtent;
 		break;
 	case 1: // South Side
-		XLoc = CurrentLocation.X - VolumeExtent.X;
-		YLoc = FMath::FRandRange(CurrentLocation.Y-VolumeExtent.Y,CurrentLocation.Y+VolumeExtent.Y);
+		XLoc = CurrentLocation.X - SpawnXExtent;
+		YLoc = FMath::FRandRange(CurrentLocation.Y-SpawnYExtent,CurrentLocation.Y+SpawnYExtent);
 		break;
 	case 2: // right side
-		XLoc = FMath::FRandRange(CurrentLocation.X-VolumeExtent.X,CurrentLocation.X+VolumeExtent.X);
-		YLoc = CurrentLocation.Y - VolumeExtent.Y;
+		XLoc = FMath::FRandRange(CurrentLocation.X-SpawnXExtent,CurrentLocation.X+SpawnXExtent);
+		YLoc = CurrentLocation.Y - SpawnYExtent;
 		break;
 	case 3: // north side
-		XLoc = CurrentLocation.X + VolumeExtent.X;
-		YLoc = FMath::FRandRange(CurrentLocation.Y-VolumeExtent.Y,CurrentLocation.Y+VolumeExtent.Y);
+		XLoc = CurrentLocation.X + SpawnXExtent;
+		YLoc = FMath::FRandRange(CurrentLocation.Y-SpawnYExtent,CurrentLocation.Y+SpawnYExtent);
 		break;
 	default:
 		break;
