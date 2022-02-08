@@ -24,6 +24,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 		TSubclassOf<class AProjectile> Projectile;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mechanics)
+		class UBoxComponent* SpawnVolume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mechanics)
+		TSubclassOf<class AEnemy> EnemyClass;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -40,4 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void MakeProjectile();
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnEnemy();
+
+private:
+	FVector GetRandomLocationOnSpawnVolumePerimeter();
 };
